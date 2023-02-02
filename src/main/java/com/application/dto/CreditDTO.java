@@ -4,12 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import static com.application.ApplicationConstants.PAYMENT_DAY;
 import static com.application.util.ApplicationUtils.getFullDaysBetweenDates;
 
+@Slf4j
 @Setter
 @Getter
 @AllArgsConstructor
@@ -26,14 +29,14 @@ public class CreditDTO {
     private List<PaymentScheduleElement> paymentSchedule;
 
     public CreditDTO (double amount, int term, double rate, LocalDate startDate, boolean isInsuranceEnabled, boolean isSalaryClient) {
-        System.out.println("enter data: amount, term, rate");
+        log.info("enter data: amount, term, rate");
         this.amount = amount;
         this.term = term;
         this.rate = rate;
         this.psk = 0;
         this.isInsuranceEnabled = isInsuranceEnabled;
         this.isSalaryClient = isSalaryClient;
-        System.out.println("Calculate PSK,monthly payment and interest payment");
+        log.info("Calculate PSK,monthly payment and interest payment");
         calculatePaymentSchedule(amount, rate, term, startDate);
     }
 

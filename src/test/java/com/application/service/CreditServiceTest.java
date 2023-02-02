@@ -51,6 +51,5 @@ class CreditServiceTest {
                 new EmploymentDTO(employmentStatus, employerINN, salary, position, workExperienceTotal, workExperienceCurrent),
                 account, isInsuranceEnabled, isSalaryClient);
         creditService.getCredit(dataDTO);
-        assertEquals(1, 1);
     }
 }

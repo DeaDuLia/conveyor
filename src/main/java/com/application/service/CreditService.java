@@ -6,6 +6,7 @@ import com.application.dto.EmploymentDTO;
 import com.application.dto.ScoringDataDTO;
 import com.application.enums.Gender;
 import com.application.enums.MaritalStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
@@ -14,6 +15,7 @@ import static com.application.ApplicationConstants.MAX_CREDIT_AGE;
 import static com.application.ApplicationConstants.MIN_CREDIT_AGE;
 import static com.application.util.ApplicationUtils.getFullYears;
 
+@Slf4j
 @Service
 public class CreditService {
     @Value("${empl.minWorkExperienceTotal}")
@@ -32,10 +34,10 @@ public class CreditService {
     private double defaultRate;
 
     public CreditDTO getCredit (ScoringDataDTO scoringDataDTO) throws Exception {
-        System.out.println("calculate rate");
+        log.info("calculate rate");
         double rate = calculateRate(scoringDataDTO);
         LocalDate nowDate = LocalDate.now();
-        System.out.println("calculate loan conditions");
+        log.info("calculate loan conditions");
         return new CreditDTO(scoringDataDTO.getAmount(), scoringDataDTO.getTerm(), rate, nowDate, scoringDataDTO.isInsuranceEnabled(), scoringDataDTO.isSalaryClient());
     }
 
@@ -44,7 +46,7 @@ public class CreditService {
         EmploymentDTO employment = scoringData.getEmployment();
         rate += calculateRateFromEmployment(employment);
         if (scoringData.getAmount() > employment.getSalary()*20) {
-            System.out.println("denied, т.к. amount > salary x 20");
+            log.warn("denied, т.к. amount > salary x 20");
             throw new Exception("denied, т.к. amount > salary x 20");
         }
         rate += calculateRateFromMaritalStatus(scoringData.getMaritalStatus());
@@ -56,7 +58,7 @@ public class CreditService {
         double rate = 0;
         switch (employment.getEmploymentStatus()) {
             case UNEMPLOYED:
-                System.out.println("denied, UNEMPLOYED");
+                log.warn("denied, UNEMPLOYED");
                 throw new Exception("denied, UNEMPLOYED");
             case SELF_EMPLOYED:
                 rate+=1;
@@ -74,7 +76,7 @@ public class CreditService {
                 break;
         }
         if (employment.getWorkExperienceTotal() < minWorkExperienceTotal || employment.getWorkExperienceCurrent() < minWorkExperienceCurrent) {
-            System.out.println("denied, Work Experience < Min");
+            log.warn("denied, Work Experience < Min");
             throw new Exception("denied, Work Experience < Min");
         }
         return rate;
@@ -95,7 +97,7 @@ public class CreditService {
         int age = getFullYears(birthDate);
         double rate = 0;
         if (age < MIN_CREDIT_AGE || age > MAX_CREDIT_AGE) {
-            System.out.println("denied, age < min or age > max");
+            log.warn("denied, age < min or age > max");
             throw new Exception("denied, age < min or age > max");
         }
         switch (gender) {
