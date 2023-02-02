@@ -15,8 +15,12 @@ public class PaymentScheduleElement {
     private int number;
     @NotNull
     private LocalDate date;
+    @NotNull
     private double totalPayment;
+    @NotNull
     private double interestPayment;
+    @NotNull
     private double debtPayment;
+    @NotNull
     private double remainingDebt;
 }

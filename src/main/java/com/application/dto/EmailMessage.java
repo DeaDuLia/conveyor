@@ -17,5 +17,6 @@ public class EmailMessage {
     private String address;
     @NotNull
     private ApplicationStatus theme;
+    @NotNull
     private long applicationId;
 }

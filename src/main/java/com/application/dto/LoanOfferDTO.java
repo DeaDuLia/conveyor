@@ -2,6 +2,9 @@ package com.application.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import javax.validation.constraints.NotNull;
+
 import static com.application.ApplicationConstants.DEFAULT_RATE;
 import static com.application.ApplicationConstants.INSURANCE_PRICE;
 
@@ -10,13 +13,21 @@ import static com.application.ApplicationConstants.INSURANCE_PRICE;
 @Getter
 @NoArgsConstructor
 public class LoanOfferDTO {
+    @NotNull
     private long applicationId;
+    @NotNull
     private double requestedAmount;
+    @NotNull
     private double totalAmount;
+    @NotNull
     private int term;
+    @NotNull
     private double monthlyPayment;
+    @NotNull
     private double rate = DEFAULT_RATE;
+    @NotNull
     private boolean isInsuranceEnabled;
+    @NotNull
     private boolean isSalaryClient;
 
     public LoanOfferDTO (double requestedAmount, int term, boolean isInsuranceEnabled, boolean isSalaryClient) {

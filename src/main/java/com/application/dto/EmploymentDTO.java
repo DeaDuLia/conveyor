@@ -20,6 +20,8 @@ public class EmploymentDTO {
     private double salary;
     @NotNull
     private EmploymentPosition position;
+    @NotNull
     private int workExperienceTotal;
+    @NotNull
     private int workExperienceCurrent;
 }
