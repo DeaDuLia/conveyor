@@ -1,6 +1,7 @@
 package com.application.dto;
 
 import com.application.enums.ApplicationStatus;
+import com.application.enums.ChangeType;
 import lombok.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -17,7 +18,7 @@ public class ApplicationStatusHistoryDTO {
     @NotNull
     private LocalDateTime time;
     @NotNull
-    private ApplicationStatus changeType;
+    private ChangeType changeType;
 }
 
 
