@@ -1,7 +1,5 @@
 package com.application.dto;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 
@@ -12,6 +10,7 @@ import static com.application.ApplicationConstants.INSURANCE_PRICE;
 @Setter
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class LoanOfferDTO {
     @NotNull
     private long applicationId;
