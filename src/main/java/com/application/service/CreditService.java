@@ -3,13 +3,20 @@ package com.application.service;
 
 import com.application.dto.CreditDTO;
 import com.application.dto.EmploymentDTO;
-import com.application.dto.PaymentScheduleElement;
+
+import com.application.dto.PaymentScheduleElementDTO;
 import com.application.dto.ScoringDataDTO;
+import com.application.entity.Credit;
+import com.application.entity.PaymentScheduleElement;
+import com.application.enums.CreditStatus;
 import com.application.enums.Gender;
 import com.application.enums.MaritalStatus;
+import com.application.repository.CreditRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +26,7 @@ import static com.application.util.ApplicationUtils.getFullDaysBetweenDates;
 import static com.application.util.ApplicationUtils.getFullYears;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class CreditService {
     @Value("${empl.minWorkExperienceTotal}")
@@ -35,18 +43,36 @@ public class CreditService {
     private int maxMaleYear;
     @Value("${global.defaultRate}")
     private double defaultRate;
+    private final CreditRepository creditRepository;
 
     public CreditDTO getCredit (ScoringDataDTO scoringDataDTO) throws Exception {
         log.info("calculate rate");
         double rate = calculateRate(scoringDataDTO);
         LocalDate nowDate = LocalDate.now();
         log.info("calculate loan conditions");
-        List<PaymentScheduleElement> paymentScheduleElements = calculatePaymentSchedule(scoringDataDTO.getAmount(), rate, scoringDataDTO.getTerm(), nowDate);
+        List<PaymentScheduleElementDTO> paymentScheduleElements = calculatePaymentSchedule(scoringDataDTO.getAmount(), rate, scoringDataDTO.getTerm(), nowDate);
         double monthlyPayment = paymentScheduleElements.get(0).getDebtPayment();
         double psk = 0;
-        for (PaymentScheduleElement tmp : paymentScheduleElements) {psk += tmp.getTotalPayment();}
+        for (PaymentScheduleElementDTO tmp : paymentScheduleElements) {psk += tmp.getTotalPayment();}
         return new CreditDTO(scoringDataDTO.getAmount(), scoringDataDTO.getTerm(), monthlyPayment, psk, rate,
                 scoringDataDTO.isInsuranceEnabled(), scoringDataDTO.isSalaryClient(), paymentScheduleElements);
+    }
+
+    public Credit createAndSaveCredit(CreditDTO creditDTO) {
+        log.info("create credit Entity");
+        List<PaymentScheduleElement> paymentScheduleElements = new ArrayList<>();
+        for (PaymentScheduleElementDTO tmp : creditDTO.getPaymentSchedule()) {
+            paymentScheduleElements.add(new com.application.entity.PaymentScheduleElement(
+                    0L, tmp.getNumber(), tmp.getDate(), tmp.getTotalPayment(),
+                    tmp.getInterestPayment(), tmp.getDebtPayment(), tmp.getRemainingDebt()
+            ));
+        }
+        Credit credit = new Credit(0, creditDTO.getAmount(), creditDTO.getTerm(),
+                creditDTO.getMonthlyPayment(), creditDTO.getRate(), creditDTO.getPsk(),
+                paymentScheduleElements, creditDTO.isInsuranceEnabled(), creditDTO.isSalaryClient(), CreditStatus.CALCULATED);
+        log.info("save credit Entity");
+        creditRepository.save(credit);
+        return credit;
     }
 
     private double calculateRate(ScoringDataDTO scoringData) throws Exception {
@@ -126,8 +152,8 @@ public class CreditService {
         return rate;
     }
 
-    private List<PaymentScheduleElement> calculatePaymentSchedule (double amount, double rate, int term, LocalDate startDate) {
-        List<PaymentScheduleElement> paymentSchedule = new ArrayList<>();
+    private List<PaymentScheduleElementDTO> calculatePaymentSchedule (double amount, double rate, int term, LocalDate startDate) {
+        List<PaymentScheduleElementDTO> paymentSchedule = new ArrayList<>();
         LocalDate nextDate = LocalDate.of(startDate.getYear(), startDate.getMonthValue(), startDate.getDayOfMonth());
         double remainingDebt = amount;
         double debtPayment = amount / term;
@@ -139,7 +165,7 @@ public class CreditService {
             double totalPayment = debtPayment + interestPayment;
 
             remainingDebt-=totalPayment;
-            paymentSchedule.add(new PaymentScheduleElement(num, LocalDate.of(nextDate.getYear(), nextDate.getMonthValue(), nextDate.getDayOfMonth()),
+            paymentSchedule.add(new PaymentScheduleElementDTO(num, LocalDate.of(nextDate.getYear(), nextDate.getMonthValue(), nextDate.getDayOfMonth()),
                     totalPayment, interestPayment, debtPayment, Math.max(remainingDebt, 0)));
         }
         return paymentSchedule;

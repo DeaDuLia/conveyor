@@ -7,11 +7,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import static com.application.ApplicationConstants.PAYMENT_DAY;
-import static com.application.util.ApplicationUtils.getFullDaysBetweenDates;
 
 @Slf4j
 @Setter
@@ -34,5 +30,5 @@ public class CreditDTO {
     @NotNull
     private boolean isSalaryClient;
     @NotNull
-    private List<PaymentScheduleElement> paymentSchedule;
+    private List<PaymentScheduleElementDTO> paymentSchedule;
 }
