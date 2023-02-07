@@ -58,7 +58,7 @@ public class ApplicationService {
 
     public Application getById (long applicationId) {
         log.info("get application by id");
-        Application app = applicationRepository.getById(applicationId);
+        Application app =  applicationRepository.findById(applicationId).get();
         if (app.getStatus_history() == null) app.setStatus_history(new StatusHistory());
         return app;
     }

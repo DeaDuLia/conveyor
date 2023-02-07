@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet id="credit" author="application">
+        <!-- Прописываем создание таблицы genre-->
+        <createTable tableName="credit">
+            <!--Создаем поля -->
+            <column name="credit_id" type="bigserial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="amount" type="double precision"/>
+            <column name="term" type="int"/>
+            <column name="monthly_payment" type="double precision"/>
+            <column name="rate" type="double precision"/>
+            <column name="psk" type="double precision"/>
+            <column name="payment_schedule" type="json"/>
+            <column name="insurance_enable" type="boolean"/>
+            <column name="salary_client" type="boolean"/>
+            <column name="credit_status" type="varchar"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
