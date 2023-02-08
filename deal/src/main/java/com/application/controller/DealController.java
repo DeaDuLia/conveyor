@@ -12,6 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -30,6 +31,7 @@ public class DealController {
     private final LoanOfferService loanOfferService;
     private final ScoringDataService scoringDataService;
     private final OfferClient offerClient;
+    private final KafkaTemplate<String, String> template;
 
     // [+] По API приходит LoanApplicationRequestDTO
     // [+] На основе LoanApplicationRequestDTO создаётся сущность Client и сохраняется в БД.
@@ -56,6 +58,7 @@ public class DealController {
     // [+] В заявке обновляется статус, история статусов(List<ApplicationStatusHistoryDTO>),
     // [+] принятое предложение LoanOfferDTO устанавливается в поле appliedOffer
     // [+] Заявка сохраняется.
+    //>[+] Отправить Email на MC dossier через Кафу
     @PutMapping(value = "/offer")
     @ApiOperation("Выбор одного из предложений")
     public void offer  (@RequestBody @Valid LoanOfferDTO loanOfferDTO) throws Exception {
@@ -63,6 +66,9 @@ public class DealController {
         Application application = applicationService.getById(loanOfferDTO.getApplicationId());
         applicationService.updateApplication(application, loanOfferDTO);
         applicationService.saveApp(application);
+        // Здесь первое письмо
+        EmailMessage email = new EmailMessage(application.getClient().getEmail(), MessageTheme.FINISH_REGISTRATION, 1);
+        template.send(email.getTheme().topic, email.getAddress());
     }
 
     // [+] По API приходит объект FinishRegistrationRequestDTO и параметр applicationId (Long).
@@ -72,6 +78,7 @@ public class DealController {
     // [+] Создаём и сохраняем Credit
     // [+] Обновляем у заявки статус и историю статусов на DOCUMENT_CREATED
     // [+] Заявка сохраняется
+    //>[+]Отправить Email на MC dossier через Кафу
     @PutMapping(value = "/calculate/{applicationId}")
     @ApiOperation("завершение регистрации + полный подсчёт кредита")
     public void calculate  (@RequestBody @Valid FinishRegistrationRequestDTO finishRegistrationRequestDTO,  @PathVariable long applicationId) throws Exception {
@@ -83,30 +90,38 @@ public class DealController {
         creditService.createAndSaveCredit(creditDTO);
         applicationService.updateApplicationStatus(application, ApplicationStatus.DOCUMENT_CREATED, ChangeType.AUTOMATIC);
         applicationService.saveApp(application);
+        EmailMessage email = new EmailMessage(application.getClient().getEmail(), MessageTheme.CREATE_DOCUMENTS, 1);
+        template.send(email.getTheme().topic, email.getAddress());
     }
 
     @PostMapping(value = "/document/{applicationId}/send")
     @ApiOperation("запрос на отправку документов")
-    public void document_send (@RequestBody @Valid EmailMessage email, @PathVariable long applicationId) throws Exception {
-        log.info("test1");
-
-        log.info("test1 ok");
+    public void document_send (@RequestBody @Valid EmailMessage msg, @PathVariable long applicationId) {
+        log.info("send msg to MC dossier (Kafka) with email: " + msg.getAddress());
+        msg.setApplicationId(applicationId);
+        EmailMessage email = new EmailMessage(msg.getAddress(), msg.getTheme(), msg.getApplicationId());
+        template.send(email.getTheme().topic, email.getAddress());
+        log.info("complete sending");
     }
 
     @PostMapping(value = "/document/{applicationId}/sign")
     @ApiOperation("запрос на подписание документов")
-    public void document_sign (@RequestBody @Valid EmailMessage email, @PathVariable long applicationId) throws Exception {
-        log.info("test2");
-
-        log.info("test2 ok");
+    public void document_sign (@RequestBody @Valid EmailMessage msg, @PathVariable long applicationId) {
+        log.info("send msg to MC dossier (Kafka) with email: " + msg.getAddress());
+        msg.setApplicationId(applicationId);
+        EmailMessage email = new EmailMessage(msg.getAddress(), msg.getTheme(), msg.getApplicationId());
+        template.send(email.getTheme().topic, email.getAddress());
+        log.info("complete sending");
     }
 
     @PostMapping(value = "/document/{applicationId}/code")
     @ApiOperation("подписание документов")
-    public void document_code (@RequestBody @Valid EmailMessage email, @PathVariable long applicationId) throws Exception {
-        log.info("test3");
-
-        log.info("test3 ok");
+    public void document_code (@RequestBody @Valid EmailMessage msg, @PathVariable long applicationId) {
+        log.info("send msg to MC dossier (Kafka) with email: " + msg.getAddress());
+        msg.setApplicationId(applicationId);
+        EmailMessage email = new EmailMessage(msg.getAddress(), msg.getTheme(), msg.getApplicationId());
+        template.send(email.getTheme().topic, email.getAddress());
+        log.info("complete sending");
     }
 
 }
