@@ -2,7 +2,6 @@ package com.application.service;
 
 import com.application.dto.LoanApplicationRequestDTO;
 import com.application.dto.LoanOfferDTO;
-import com.application.validation.impl.OfferValidationImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,6 @@ import static com.application.ApplicationConstants.INSURANCE_PRICE;
 public class LoanOfferService {
 
     public List<LoanOfferDTO> getOffers (LoanApplicationRequestDTO request) throws Exception {
-        new OfferValidationImpl().validAgeByMinValue(request.getBirthdate());
         return createOffers(request);
     }
 
