@@ -30,6 +30,12 @@ public class DealController {
     private final ScoringDataService scoringDataService;
     private final OfferClient offerClient;
 
+    // [+] По API приходит LoanApplicationRequestDTO
+    // [+] На основе LoanApplicationRequestDTO создаётся сущность Client и сохраняется в БД.
+    // [+] Создаётся Application со связью на только что созданный Client и сохраняется в БД.
+    // [+] Отправляется POST запрос на /conveyor/offers МС conveyor через FeignClient
+    // [+] Каждому элементу из списка List<LoanOfferDTO> присваивается id созданной заявки (Application)
+    // [+] Ответ на API - список из 4х LoanOfferDTO от "худшего" к "лучшему".
     @PostMapping(value = "/application")
     @ApiOperation("расчёт возможных условий кредита")
     public List<LoanOfferDTO> application  (@RequestBody @Valid LoanApplicationRequestDTO request) throws Exception {
@@ -44,6 +50,11 @@ public class DealController {
         return offers;
     }
 
+    // [+] По API приходит LoanOfferDTO
+    // [+] Достаётся из БД заявка(Application) по applicationId из LoanOfferDTO.
+    // [+] В заявке обновляется статус, история статусов(List<ApplicationStatusHistoryDTO>),
+    // [+] принятое предложение LoanOfferDTO устанавливается в поле appliedOffer
+    // [+] Заявка сохраняется.
     @PutMapping(value = "/offer")
     @ApiOperation("Выбор одного из предложений")
     public void offer  (@RequestBody @Valid LoanOfferDTO loanOfferDTO) throws Exception {
@@ -52,7 +63,14 @@ public class DealController {
         applicationService.updateApplication(application, loanOfferDTO);
         applicationService.saveApp(application);
     }
-
+    
+    // [+] По API приходит объект FinishRegistrationRequestDTO и параметр applicationId (Long).
+    // [+] Достаётся из БД заявка(Application) по applicationId.
+    // [+] ScoringDataDTO насыщается информацией из FinishRegistrationRequestDTO и Client, который хранится в Application
+    // [+] Отправляется POST запрос к МС КК с телом ScoringDataDTO
+    // [+] Создаём и сохраняем Credit
+    // [+] Обновляем у заявки статус и историю статусов на DOCUMENT_CREATED
+    // [+] Заявка сохраняется
     @PutMapping(value = "/calculate/{applicationId}")
     @ApiOperation("завершение регистрации + полный подсчёт кредита")
     public void calculate  (@RequestBody @Valid FinishRegistrationRequestDTO finishRegistrationRequestDTO,  @PathVariable long applicationId) throws Exception {
