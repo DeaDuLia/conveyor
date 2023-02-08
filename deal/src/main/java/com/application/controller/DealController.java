@@ -6,6 +6,7 @@ import com.application.dto.*;
 import com.application.entity.*;
 import com.application.enums.ApplicationStatus;
 import com.application.enums.ChangeType;
+import com.application.enums.MessageTheme;
 import com.application.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -63,7 +64,7 @@ public class DealController {
         applicationService.updateApplication(application, loanOfferDTO);
         applicationService.saveApp(application);
     }
-    
+
     // [+] По API приходит объект FinishRegistrationRequestDTO и параметр applicationId (Long).
     // [+] Достаётся из БД заявка(Application) по applicationId.
     // [+] ScoringDataDTO насыщается информацией из FinishRegistrationRequestDTO и Client, который хранится в Application
@@ -83,4 +84,29 @@ public class DealController {
         applicationService.updateApplicationStatus(application, ApplicationStatus.DOCUMENT_CREATED, ChangeType.AUTOMATIC);
         applicationService.saveApp(application);
     }
+
+    @PostMapping(value = "/document/{applicationId}/send")
+    @ApiOperation("запрос на отправку документов")
+    public void document_send (@RequestBody @Valid EmailMessage email, @PathVariable long applicationId) throws Exception {
+        log.info("test1");
+
+        log.info("test1 ok");
+    }
+
+    @PostMapping(value = "/document/{applicationId}/sign")
+    @ApiOperation("запрос на подписание документов")
+    public void document_sign (@RequestBody @Valid EmailMessage email, @PathVariable long applicationId) throws Exception {
+        log.info("test2");
+
+        log.info("test2 ok");
+    }
+
+    @PostMapping(value = "/document/{applicationId}/code")
+    @ApiOperation("подписание документов")
+    public void document_code (@RequestBody @Valid EmailMessage email, @PathVariable long applicationId) throws Exception {
+        log.info("test3");
+
+        log.info("test3 ok");
+    }
+
 }
