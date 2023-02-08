@@ -5,9 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.config.TopicBuilder;
-
 
 @SpringBootApplication
 @EnableFeignClients
@@ -18,16 +16,45 @@ public class Application {
 	}
 
 	@Bean
-	public NewTopic topic() {
+	public NewTopic topic1() {
 		return TopicBuilder.name("finish-registration")
 				.partitions(10)
 				.replicas(1)
 				.build();
 	}
-
-	@KafkaListener(id = "myId", topics = "finish-registration")
-	public void listen(String in) {
-		System.out.println(in);
+	@Bean
+	public NewTopic topic2() {
+		return TopicBuilder.name("create-documents")
+				.partitions(10)
+				.replicas(1)
+				.build();
 	}
-
+	@Bean
+	public NewTopic topic3() {
+		return TopicBuilder.name("send-documents")
+				.partitions(10)
+				.replicas(1)
+				.build();
+	}
+	@Bean
+	public NewTopic topic4() {
+		return TopicBuilder.name("send-ses")
+				.partitions(10)
+				.replicas(1)
+				.build();
+	}
+	@Bean
+	public NewTopic topic5() {
+		return TopicBuilder.name("credit-issued")
+				.partitions(10)
+				.replicas(1)
+				.build();
+	}
+	@Bean
+	public NewTopic topic6() {
+		return TopicBuilder.name("application-denied")
+				.partitions(10)
+				.replicas(1)
+				.build();
+	}
 }
