@@ -1,6 +1,6 @@
 package com.application.dto;
 
-import com.application.enums.ApplicationStatus;
+import com.application.enums.MessageTheme;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +16,7 @@ public class EmailMessage {
     @NotNull
     private String address;
     @NotNull
-    private ApplicationStatus theme;
+    private MessageTheme theme;
     @NotNull
     private long applicationId;
 }
