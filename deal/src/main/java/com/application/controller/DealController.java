@@ -96,32 +96,48 @@ public class DealController {
 
     @PostMapping(value = "/document/{applicationId}/send")
     @ApiOperation("запрос на отправку документов")
-    public void document_send (@RequestBody @Valid EmailMessage msg, @PathVariable long applicationId) {
+    public void document_send (@PathVariable long applicationId) {
+        Application application = applicationService.getById(applicationId);
+        EmailMessage msg = new EmailMessage(application.getClient().getEmail(), MessageTheme.SEND_DOCUMENTS, applicationId);
         log.info("send msg to MC dossier (Kafka) with email: " + msg.getAddress());
         msg.setApplicationId(applicationId);
-        EmailMessage email = new EmailMessage(msg.getAddress(), msg.getTheme(), msg.getApplicationId());
-        template.send(email.getTheme().topic, email.getAddress());
+        template.send(msg.getTheme().topic, msg.getAddress());
         log.info("complete sending");
     }
 
     @PostMapping(value = "/document/{applicationId}/sign")
     @ApiOperation("запрос на подписание документов")
-    public void document_sign (@RequestBody @Valid EmailMessage msg, @PathVariable long applicationId) {
+    public void document_sign (@PathVariable long applicationId) {
+        Application application = applicationService.getById(applicationId);
+        EmailMessage msg = new EmailMessage(application.getClient().getEmail(), MessageTheme.SEND_SES, applicationId);
         log.info("send msg to MC dossier (Kafka) with email: " + msg.getAddress());
         msg.setApplicationId(applicationId);
-        EmailMessage email = new EmailMessage(msg.getAddress(), msg.getTheme(), msg.getApplicationId());
-        template.send(email.getTheme().topic, email.getAddress());
+        template.send(msg.getTheme().topic, msg.getAddress());
         log.info("complete sending");
     }
 
     @PostMapping(value = "/document/{applicationId}/code")
     @ApiOperation("подписание документов")
-    public void document_code (@RequestBody @Valid EmailMessage msg, @PathVariable long applicationId) {
+    public void document_code (@PathVariable long applicationId) {
+        Application application = applicationService.getById(applicationId);
+        EmailMessage msg = new EmailMessage(application.getClient().getEmail(), MessageTheme.CREDIT_ISSUED, applicationId);
         log.info("send msg to MC dossier (Kafka) with email: " + msg.getAddress());
         msg.setApplicationId(applicationId);
-        EmailMessage email = new EmailMessage(msg.getAddress(), msg.getTheme(), msg.getApplicationId());
-        template.send(email.getTheme().topic, email.getAddress());
+        template.send(msg.getTheme().topic, msg.getAddress());
         log.info("complete sending");
     }
 
+    @GetMapping(value = "/admin/application/{applicationId}")
+    @ApiOperation("подписание документов")
+    public Application get_app_byId (@PathVariable long applicationId) {
+        log.info("get app by id " + applicationId);
+        return applicationService.getById(applicationId);
+    }
+
+    @GetMapping(value = "/admin/application")
+    @ApiOperation("подписание документов")
+    public List<Application> get_apps () {
+        log.info("get all apps");
+        return applicationService.getAll();
+    }
 }
