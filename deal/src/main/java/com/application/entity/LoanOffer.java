@@ -7,10 +7,6 @@ import lombok.Setter;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-
-import static com.application.ApplicationConstants.DEFAULT_RATE;
-import static com.application.ApplicationConstants.INSURANCE_PRICE;
 
 @Entity
 @Getter

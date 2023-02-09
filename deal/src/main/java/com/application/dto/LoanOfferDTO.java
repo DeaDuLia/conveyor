@@ -2,7 +2,7 @@ package com.application.dto;
 import lombok.*;
 
 import javax.validation.constraints.NotNull;
-import static com.application.ApplicationConstants.DEFAULT_RATE;
+import static com.application.DealConstants.DEFAULT_RATE;
 
 @Setter
 @Getter

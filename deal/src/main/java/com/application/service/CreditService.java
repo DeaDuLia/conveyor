@@ -23,20 +23,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class CreditService {
-    @Value("${empl.minWorkExperienceTotal}")
-    private int minWorkExperienceTotal;
-    @Value("${empl.minWorkExperienceCurrent}")
-    private int minWorkExperienceCurrent;
-    @Value("${credit.minFemaleYear}")
-    private int minFemYear;
-    @Value("${credit.maxFemaleYear}")
-    private int maxFemYear;
-    @Value("${credit.minMaleYear}")
-    private int minMaleYear;
-    @Value("${credit.maxMaleYear}")
-    private int maxMaleYear;
-    @Value("${global.defaultRate}")
-    private double defaultRate;
     private final CreditRepository creditRepository;
 
     public Credit createAndSaveCredit(CreditDTO creditDTO) {
