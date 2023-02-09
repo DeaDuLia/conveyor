@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.application.ApplicationConstants.DEFAULT_RATE;
-import static com.application.ApplicationConstants.INSURANCE_PRICE;
+import static com.application.ConveyorConstatnts.DEFAULT_RATE;
+import static com.application.ConveyorConstatnts.INSURANCE_PRICE;
 
 @Slf4j
 @Service
